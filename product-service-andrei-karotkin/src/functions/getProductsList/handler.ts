@@ -3,10 +3,8 @@ import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 
 import schema from './schema';
+import productService from "../../services";
 
-import {ProductService} from '../../services/products';
-
-const productService = new ProductService();
 
 export const getProductsListHandler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
   console.log('Incoming Event', event);

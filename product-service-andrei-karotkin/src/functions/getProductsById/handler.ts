@@ -1,20 +1,26 @@
-import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 
-import schema from './schema';
+import productService from "../../services";
+import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 
-import {ProductService} from '../../services/products';
 
-const productService = new ProductService();
-
-export const getProductByIdHandler: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
+export const getProductByIdHandler= async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   console.log('Incoming Event', event);
   try {
-    const product = await productService.getProduct(event.pathParameters?.Id);
-    return formatJSONResponse(product);
+    const id = event.pathParameters.Id;
+    console.log('Id', id);
+    const product = await productService.getProduct(id);
+    return formatJSONResponse({
+      product
+    });
   } catch (error) {
-    return formatJSONResponse(error.message);
+    console.log('Error', error);
+  
+    return formatJSONResponse({
+      status: 500,
+      message: error
+    });
   }
 };
 

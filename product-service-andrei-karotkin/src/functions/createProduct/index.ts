@@ -1,12 +1,12 @@
 import { handlerPath } from '@libs/handler-resolver';
 
 export default {
-  handler: `${handlerPath(__dirname)}/handler.getProductsList`,
+  handler: `${handlerPath(__dirname)}/handler.createProduct`,
   events: [
     {
       http: {
-        method: 'get',
-        path: '/products',
+        method: 'post',
+        path: '/product',
         cors: true
       },
     },
