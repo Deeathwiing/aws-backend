@@ -84,12 +84,9 @@ const serverlessConfiguration: AWS = {
           KeySchema: [{
             AttributeName: "id",
             KeyType: "HASH"
-          }, {
-            AttributeName: "title",
-            KeyType: "RANGE"
           }
         ],
-        LocalSecondaryIndexes: [
+        GlobalSecondaryIndexes: [
         {
             IndexName: "trashIndex",
             KeySchema: [
@@ -104,7 +101,11 @@ const serverlessConfiguration: AWS = {
             ],
             Projection: {
               ProjectionType: "KEYS_ONLY"
-            }
+            },
+            ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1
+          },
         },
         {
             IndexName: "trashIndexTwo",
@@ -120,7 +121,11 @@ const serverlessConfiguration: AWS = {
             ],
             Projection: {
               ProjectionType: "KEYS_ONLY"
-            }
+            },
+            ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1
+          },
         },
          {
             IndexName: "trashIndexThree",
@@ -136,7 +141,31 @@ const serverlessConfiguration: AWS = {
             ],
             Projection: {
               ProjectionType: "KEYS_ONLY"
-            }
+            },
+            ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1
+          },
+        },
+        {
+            IndexName: "trashIndexFour",
+            KeySchema: [
+                {
+                    AttributeName: "id",
+                    KeyType: "HASH"
+                },
+                {
+                    AttributeName: "title",
+                    KeyType: "RANGE"
+                },
+            ],
+            Projection: {
+              ProjectionType: "KEYS_ONLY"
+            },
+            ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1
+          },
         }
     ],
           ProvisionedThroughput: {

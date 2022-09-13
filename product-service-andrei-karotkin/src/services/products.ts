@@ -27,9 +27,12 @@ export default class ProductService {
         const product = await this.docClient.get({
             TableName: this.TABLE_NAME,
             Key: {
-                id: id
+                id
             }
         }).promise();
+
+        console.log('[Get Product] Product', product);
+        
 
         if (!product.Item) {
             throw new Error('The product not found');

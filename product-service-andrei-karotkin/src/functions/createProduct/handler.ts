@@ -10,16 +10,21 @@ export const createProductHandler = async (event: APIGatewayProxyEvent): Promise
   console.log('Incoming Event', event);
   try {
     const id = v4();
+      // @ts-ignore
+    const {title, description, count, price} = event.body;
+
+    if(!title || !description || !count || !price) {return formatJSONResponse({
+      status: 400,
+      message: 'Invalid post data'
+    });
+  }
+
     const product = await productService.createProduct({
       id,
-      // @ts-ignore
-      title: event.body.title,
-      // @ts-ignore
-      description: event.body.description,
-      // @ts-ignore
-      count: event.body.count,
-      // @ts-ignore
-      price: event.body.price,
+      title,
+      description,
+      count,
+      price,
     })
     return formatJSONResponse({
       product
