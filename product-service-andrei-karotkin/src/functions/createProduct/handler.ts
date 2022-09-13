@@ -30,6 +30,8 @@ export const createProductHandler = async (event: APIGatewayProxyEvent): Promise
       product
     });
   } catch (e) {
+    console.log('Error', e);
+    
     return formatJSONResponse({
       status: 500,
       message: e
