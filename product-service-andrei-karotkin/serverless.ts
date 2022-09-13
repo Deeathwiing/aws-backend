@@ -80,11 +80,65 @@ const serverlessConfiguration: AWS = {
           },{
             AttributeName: "description",
             AttributeType: "S",
-          },],
+          }],
           KeySchema: [{
             AttributeName: "id",
             KeyType: "HASH"
-          }],
+          }, {
+            AttributeName: "title",
+            KeyType: "RANGE"
+          }
+        ],
+        LocalSecondaryIndexes: [
+        {
+            IndexName: "trashIndex",
+            KeySchema: [
+                {
+                    AttributeName: "id",
+                    KeyType: "HASH"
+                },
+                {
+                    AttributeName: "price",
+                    KeyType: "RANGE"
+                }
+            ],
+            Projection: {
+              ProjectionType: "KEYS_ONLY"
+            }
+        },
+        {
+            IndexName: "trashIndexTwo",
+            KeySchema: [
+                {
+                    AttributeName: "id",
+                    KeyType: "HASH"
+                },
+                {
+                    AttributeName: "count",
+                    KeyType: "RANGE"
+                },
+            ],
+            Projection: {
+              ProjectionType: "KEYS_ONLY"
+            }
+        },
+         {
+            IndexName: "trashIndexThree",
+            KeySchema: [
+                {
+                    AttributeName: "id",
+                    KeyType: "HASH"
+                },
+                {
+                    AttributeName: "description",
+                    KeyType: "RANGE"
+                },
+            ],
+            Projection: {
+              ProjectionType: "KEYS_ONLY"
+            }
+        }
+    ],
           ProvisionedThroughput: {
             ReadCapacityUnits: 1,
             WriteCapacityUnits: 1
