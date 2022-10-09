@@ -21,20 +21,18 @@ const importFileParserHandler = async (event: S3Event): Promise<void> => {
               })
               .createReadStream();
           await new Promise((resolve, reject) => {
-              console.log('s3Stream------');
 
               s3Stream
                   .pipe(csv())
                   .on('data', (data) => {
-                      console.log('DATA-----------:', data);
+                      console.log('Parsed Data:', data);
                       parsedData = [...parsedData, data];
                   })
                   .on('error', (error) => {
-                      console.log('error-----------', error);
+                      console.log('Error', error);
                       reject('ERROR: ' + error);
                   })
                   .on('end', async () => {
-                      console.log('Parsed-----------');
 
                       await s3
                           .copyObject({
@@ -44,7 +42,6 @@ const importFileParserHandler = async (event: S3Event): Promise<void> => {
                           })
                           .promise();
 
-                      console.log('Copied-----------');
 
                       await s3
                           .deleteObject({
@@ -53,9 +50,9 @@ const importFileParserHandler = async (event: S3Event): Promise<void> => {
                           })
                           .promise();
 
-                      console.log('Deleted-----------');
 
-                      resolve('parsed!');
+                      console.log('Parsed Data', parsedData);
+                      resolve(parsedData);
                   });
           });
       }
