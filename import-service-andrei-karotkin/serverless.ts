@@ -18,7 +18,7 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
-      BUCKET_NAME: 'import-service-bucket'
+      BUCKET_NAME: 'import-service-bucket-andrei-karotkin'
     },
     iam: {
       role: {
@@ -32,17 +32,24 @@ const serverlessConfiguration: AWS = {
     },
   },
   resources: {
+    extensions: {
+      IamRoleCustomResourcesLambdaExecution: {
+        Properties: {
+          PermissionsBoundary: 'arn:aws:iam::${aws:accountId}:policy/eo_role_boundary'
+        }
+      }
+    },
     Resources: {
       importServiceBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
-          BucketName: 'import-service-bucket',
+          BucketName: 'import-service-bucket-andrei-karotkin',
         },
       },
       importServiceBucketPolicy: {
         Type: 'AWS::S3::BucketPolicy',
         Properties: {
-          Bucket: 'import-service-bucket',
+          Bucket: 'import-service-bucket-andrei-karotkin',
           PolicyDocument: {
             Statement: [
               {
@@ -52,8 +59,8 @@ const serverlessConfiguration: AWS = {
                 },
                 Action: ['*'],
                 Resource: [
-                  'arn:aws:s3:::import-service-bucket',
-                  'arn:aws:s3:::import-service-bucket/*',
+                  'arn:aws:s3:::import-service-bucket-andrei-karotkin',
+                  'arn:aws:s3:::import-service-bucket-andrei-karotkin/*',
                 ],
               },
             ],

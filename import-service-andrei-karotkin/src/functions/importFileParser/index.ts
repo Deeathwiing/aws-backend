@@ -5,7 +5,7 @@ export default {
   events: [
     {
       s3: {
-        bucket: 'import-service-bucket',
+        bucket: 'import-service-bucket-andrei-karotkin',
         event: 's3:ObjectCreated:*',
         rules: [
           {prefix: 'uploaded/'}
