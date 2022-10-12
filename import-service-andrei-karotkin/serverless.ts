@@ -44,6 +44,13 @@ const serverlessConfiguration: AWS = {
         Type: 'AWS::S3::Bucket',
         Properties: {
           BucketName: 'import-service-bucket-andrei-karotkin',
+          CorsConfiguration: {
+            CorsRules: [{
+              AllowedHeaders: ['*'],
+              AllowedMethods: ['GET','PUT','POST','DELETE'],
+              AllowedOrigins: ['*']
+            }]
+          }
         },
       },
       importServiceBucketPolicy: {

@@ -1,17 +1,13 @@
-import schema from './schema';
 import { handlerPath } from '@libs/handler-resolver';
 
 export default {
-  handler: `${handlerPath(__dirname)}/handler.main`,
+  handler: `${handlerPath(__dirname)}/handler.importProductsFile`,
   events: [
     {
       http: {
         method: 'get',
         path: 'import',
         request: {
-          schemas: {
-            'application/json': schema,
-          },
           parameters: {
             querystrings: {
               name: true,
