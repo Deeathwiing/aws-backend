@@ -3,6 +3,7 @@ import type { AWS } from '@serverless/typescript';
 import getProductsList from '@functions/getProductsList';
 import getProductById from "@functions/getProductsById";
 import createProduct from "@functions/createProduct";
+import catalogBatchProcess from "@functions/catalogBatchProcess";
 
 const serverlessConfiguration: AWS = {
   service: 'product-service-andrei-karotkin',
@@ -14,7 +15,7 @@ const serverlessConfiguration: AWS = {
         permissionsBoundary: 'arn:aws:iam::${aws:accountId}:policy/eo_role_boundary',
         statements: [{
           Effect: 'Allow',
-          Action: ['s3:*', 'dynamodb:*'],
+          Action: ['s3:*', 'dynamodb:*', 'sns:*'],
           Resource: '*'
         }]
       }
@@ -31,10 +32,13 @@ const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       PRODUCT_TABLE_NAME: 'Products-Andrei-Karotkin',
+      SQS_ARN: 'arn:aws:sqs:eu-central-1:398158581759:catalogItemsQueueAndreiKarotkin',
+      SNS_TOPIC_NAME: 'topicAndreiKarotkin',
+      SNS_ARN: { Ref: 'topicAndreiKarotkin' },
     },
   },
   // import the function via paths
-  functions: { getProductsList, getProductById, createProduct },
+  functions: { getProductsList, getProductById, createProduct,catalogBatchProcess },
   package: { individually: true },
   custom: {
     esbuild: {
@@ -64,7 +68,7 @@ const serverlessConfiguration: AWS = {
       ProductsTable: {
         Type: "AWS::DynamoDB::Table",
         Properties: {
-          TableName: "Products-Andrei-Karotkin",
+          TableName: "${self:provider.environment.PRODUCT_TABLE_NAME}",
           AttributeDefinitions: [{
             AttributeName: "id",
             AttributeType: "S",
@@ -173,7 +177,21 @@ const serverlessConfiguration: AWS = {
             WriteCapacityUnits: 1
           },
         }
-      }
+      },
+      topicAndreiKarotkin: {
+            Type: 'AWS::SNS::Topic',
+            Properties: {
+                TopicName: '${self:provider.environment.SNS_TOPIC_NAME}',
+            },
+        },
+      SNSSubscription: {
+            Type: 'AWS::SNS::Subscription',
+            Properties: {
+                Endpoint: 'andreykorotkins@gmail.com',
+                Protocol: 'email',
+                TopicArn: { Ref: '${self:provider.environment.SNS_TOPIC_NAME}' },
+            },
+        },
     }
   }
 };

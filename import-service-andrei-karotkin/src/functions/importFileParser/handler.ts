@@ -3,6 +3,10 @@ import csv from 'csv-parser';
 
 import {  S3Event} from "aws-lambda";
 import * as AWS from 'aws-sdk';
+const SQS_URL = process.env.SQS_URL;
+console.log(SQS_URL);
+const sqs = new AWS.SQS();
+
 
 const importFileParserHandler = async (event: S3Event): Promise<void> => {
   console.log('Incoming Event', event);
@@ -24,9 +28,16 @@ const importFileParserHandler = async (event: S3Event): Promise<void> => {
 
               s3Stream
                   .pipe(csv())
-                  .on('data', (data) => {
+                  .on('data', async (data) => {
                       console.log('Parsed Data:', data);
                       parsedData = [...parsedData, data];
+                      let req = await sqs
+                          .sendMessage({
+                              QueueUrl: SQS_URL,
+                              MessageBody: JSON.stringify(data),
+                          })
+                      const res = await req.promise();
+                      console.log('Message sended', res)
                   })
                   .on('error', (error) => {
                       console.log('Error', error);
