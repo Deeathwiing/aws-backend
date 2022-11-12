@@ -6,6 +6,22 @@ import importFileParser from "@functions/importFileParser";
 const serverlessConfiguration: AWS = {
   service: 'import-service-andrei-karotkin',
   frameworkVersion: '3',
+  custom: {
+    esbuild: {
+      bundle: true,
+      minify: false,
+      sourcemap: true,
+      exclude: ['aws-sdk'],
+      target: 'node14',
+      define: { 'require.resolve': undefined },
+      platform: 'node',
+      concurrency: 10,
+    },
+    serverLessVariables: {
+      BUCKET_NAME: 'import-service-bucket-andrei-karotkin',
+      SQS_NAME: 'catalogItemsQueueAndreiKarotkin'
+    }
+  },
   plugins: ['serverless-esbuild'],
   provider: {
     name: 'aws',
@@ -18,16 +34,25 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
-      BUCKET_NAME: 'import-service-bucket-andrei-karotkin'
+      BUCKET_NAME: '${self:custom.serverLessVariables.BUCKET_NAME}',
+      SQS_URL:  { Ref: '${self:custom.serverLessVariables.SQS_NAME}' },
     },
     iam: {
       role: {
         permissionsBoundary: 'arn:aws:iam::${aws:accountId}:policy/eo_role_boundary',
-        statements: [{
-          Effect: 'Allow',
-          Action: ['s3:*'],
-          Resource: '*'
-        }]
+        statements: [
+            {
+              Effect: 'Allow',
+              Action: ['s3:*'],
+              Resource: '*'
+            },
+            {
+              Effect: 'Allow',
+              Action: ['sqs:*'],
+              Resource: {
+                'Fn::GetAtt': ['${self:custom.serverLessVariables.SQS_NAME}', 'Arn'],
+              },
+            }]
       }
     },
   },
@@ -43,7 +68,7 @@ const serverlessConfiguration: AWS = {
       importServiceBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
-          BucketName: 'import-service-bucket-andrei-karotkin',
+          BucketName: '${self:custom.serverLessVariables.BUCKET_NAME}',
           CorsConfiguration: {
             CorsRules: [{
               AllowedHeaders: ['*'],
@@ -56,7 +81,7 @@ const serverlessConfiguration: AWS = {
       importServiceBucketPolicy: {
         Type: 'AWS::S3::BucketPolicy',
         Properties: {
-          Bucket: 'import-service-bucket-andrei-karotkin',
+          Bucket: '${self:custom.serverLessVariables.BUCKET_NAME}',
           PolicyDocument: {
             Statement: [
               {
@@ -74,23 +99,33 @@ const serverlessConfiguration: AWS = {
           },
         },
       },
+      catalogItemsQueueAndreiKarotkin: {
+        Type: 'AWS::SQS::Queue',
+        Properties: {
+          QueueName: '${self:custom.serverLessVariables.SQS_NAME}',
+        },
+      },
+      catalogItemsQueueAndreiKarotkinPolicy: {
+        Type: 'AWS::SQS::QueuePolicy',
+        Properties: {
+          Queues: [{ Ref: '${self:custom.serverLessVariables.SQS_NAME}' }],
+          PolicyDocument: {
+            Statement: [
+              {
+                Action: ['sqs:*'],
+                Effect: 'Allow',
+                Resource: '*',
+              },
+            ],
+          },
+        },
+      },
     }
   },
   // import the function via paths
   functions: { importProductsFile, importFileParser },
   package: { individually: true },
-  custom: {
-    esbuild: {
-      bundle: true,
-      minify: false,
-      sourcemap: true,
-      exclude: ['aws-sdk'],
-      target: 'node14',
-      define: { 'require.resolve': undefined },
-      platform: 'node',
-      concurrency: 10,
-    },
-  },
+
 };
 
 module.exports = serverlessConfiguration;
