@@ -36,6 +36,7 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       BUCKET_NAME: '${self:custom.serverLessVariables.BUCKET_NAME}',
       SQS_URL:  { Ref: '${self:custom.serverLessVariables.SQS_NAME}' },
+      AUTHORIZER_ARN: 'arn:aws:lambda:eu-central-1:398158581759:function:auth-service-andrei-karotkin-dev-basicAuthorizer'
     },
     iam: {
       role: {
